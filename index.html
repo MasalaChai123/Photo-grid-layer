@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Silky Island Spaces</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+      body {
+        font-family: 'Inter', 'Noto Sans TC', sans-serif;
+        background-color: #f9fafb;
+      }
+      /* Custom scrollbar for cleaner look */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af;
+      }
+      .font-handwriting {
+        font-family: 'cursive'; 
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      // --- ICONS (Inline SVG components to replace lucide-react) ---
+      const ArrowRight = (props) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
+      );
+      const ArrowUp = (props) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>
+      );
+      const Instagram = (props) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+      );
+      const MessageCircle = (props) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+      );
+
+      // --- COMPONENTS ---
+
+      // 1. BackToTop Component
+      const BackToTop = () => {
+        const [isVisible, setIsVisible] = useState(false);
+
+        const toggleVisibility = () => {
+          if (window.pageYOffset > 300) {
+            setIsVisible(true);
+          } else {
+            setIsVisible(false);
+          }
+        };
+
+        const scrollToTop = () => {
+          window.scrollTo({
+            top: 0,
+            behavior: 'smooth',
+          });
+        };
+
+        useEffect(() => {
+          window.addEventListener('scroll', toggleVisibility);
+          return () => {
+            window.removeEventListener('scroll', toggleVisibility);
+          };
+        }, []);
+
+        return (
+          <div className={`fixed bottom-24 right-6 z-50 transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+            <button
+              onClick={scrollToTop}
+              className="bg-white border border-gray-200 text-gray-600 hover:text-gray-900 hover:border-gray-400 shadow-lg rounded-full px-4 py-2 flex items-center gap-2 transition-all duration-300 text-sm font-medium group"
+            >
+              Back to the top
+              <ArrowUp className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
+            </button>
+          </div>
+        );
+      };
+
+      // 2. GridItem Component
+      const GridItem = ({ item }) => {
+        return (
+          <div className="group relative w-full aspect-square overflow-hidden bg-gray-100 cursor-pointer">
+            {/* Background Image */}
+            <img
+              src={item.imageUrl}
+              alt={item.title}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              loading="lazy"
+            />
+
+            {/* Icon/Indicator in top right */}
+            <div className="absolute top-3 right-3 z-10">
+               <div className="bg-black/20 backdrop-blur-sm p-1.5 rounded-md">
+                  <div className="border border-white/80 w-3 h-3 rounded-sm"></div>
+               </div>
+            </div>
+
+            {/* Sliding Overlay - Moves from Left to Right */}
+            <div className="absolute inset-y-0 left-0 bg-slate-900/80 backdrop-blur-[2px] w-0 group-hover:w-full transition-all duration-500 ease-out overflow-hidden flex flex-col items-center justify-center text-white z-20">
+              
+              {/* Content Container */}
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100 flex flex-col items-center space-y-4 p-4 text-center min-w-[200px]">
+                
+                <h3 className="text-xl font-bold tracking-wider border-b border-white/30 pb-2 mb-2">
+                  {item.title}
+                </h3>
+
+                <div className="flex flex-col gap-2">
+                  {item.tags.map((tag, index) => (
+                    <span 
+                      key={index} 
+                      className="text-sm font-light tracking-wide hover:text-yellow-400 transition-colors flex items-center justify-center gap-2"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="mt-4 pt-4">
+                  <button className="bg-transparent border border-white/40 hover:bg-white hover:text-black text-xs px-4 py-2 rounded-full transition-all duration-300 flex items-center gap-2">
+                    View Details <ArrowRight className="w-3 h-3" />
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      // 3. Footer Component
+      const Footer = () => {
+        return (
+          <footer className="mt-16 pb-10 border-t border-gray-200 pt-8">
+            <div className="max-w-5xl mx-auto px-6 flex flex-col md:flex-row justify-between items-end md:items-center gap-6">
+              
+              {/* Brand Name */}
+              <div className="flex flex-col">
+                <span className="text-xs text-gray-400 mb-1 uppercase tracking-widest">Designed by</span>
+                <h2 className="text-3xl md:text-4xl font-handwriting font-bold text-red-500" style={{ fontFamily: 'cursive' }}>
+                  Silky Island Group
+                </h2>
+              </div>
+
+              {/* Social Icons */}
+              <div className="flex flex-col items-end">
+                  <div className="flex items-center gap-4 mb-2">
+                      <a href="#" className="p-2 bg-gray-100 rounded-full text-gray-600 hover:bg-pink-50 hover:text-pink-600 transition-colors">
+                          <Instagram className="w-5 h-5" />
+                      </a>
+                      <a href="#" className="p-2 bg-gray-100 rounded-full text-gray-600 hover:bg-green-50 hover:text-green-600 transition-colors">
+                          <MessageCircle className="w-5 h-5" />
+                      </a>
+                      <div className="h-px w-8 bg-gray-300 hidden md:block"></div>
+                  </div>
+                  <p className="text-xl font-bold text-red-500 tracking-wide font-handwriting" style={{ fontFamily: 'cursive' }}>
+                      IG . Line
+                  </p>
+              </div>
+            </div>
+            
+            <div className="max-w-5xl mx-auto px-6 mt-4 flex justify-between items-center text-[10px] text-gray-400">
+               <p>© 2024 Silky Island Group. All rights reserved.</p>
+               <p>RIBA Chartered Practice</p>
+            </div>
+          </footer>
+        );
+      };
+
+      // 4. App Component
+      const App = () => {
+        // Mock Data - One choice per image
+        const mockItems = [
+          {
+            id: '1',
+            imageUrl: 'https://picsum.photos/seed/arch1/800/800',
+            title: '空間預約私訊IG',
+            tags: ['空間預定'],
+          },
+          {
+            id: '2',
+            imageUrl: 'https://picsum.photos/seed/arch2/800/800',
+            title: 'Balance Workspace',
+            tags: ['聚會用餐'],
+          },
+          {
+            id: '3',
+            imageUrl: 'https://picsum.photos/seed/arch3/800/800',
+            title: 'Garden View',
+            tags: ['商用會議'],
+          },
+          {
+            id: '4',
+            imageUrl: 'https://picsum.photos/seed/arch4/800/800',
+            title: 'Modern Hall',
+            tags: ['多媒體拍攝'],
+          },
+          {
+            id: '5',
+            imageUrl: 'https://picsum.photos/seed/arch5/800/800',
+            title: 'Lounge Area',
+            tags: ['聚會用餐'],
+          },
+          {
+            id: '6',
+            imageUrl: 'https://picsum.photos/seed/pool/800/800',
+            title: 'Poolside Suite',
+            tags: ['商用會議'],
+          },
+        ];
+
+        return (
+          <div className="min-h-screen bg-white text-gray-800 font-sans selection:bg-red-100 selection:text-red-900">
+            <main className="max-w-5xl mx-auto px-4 py-12 md:py-20">
+              
+              <div className="mb-12 text-center relative">
+                <h1 className="text-3xl md:text-4xl font-bold text-blue-600 mb-2 relative inline-block font-handwriting" style={{ fontFamily: 'cursive' }}>
+                  租借區域氛圍照
+                  <svg className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-24 h-6 text-blue-300 opacity-50" viewBox="0 0 100 20" fill="none" stroke="currentColor" strokeWidth="2">
+                     <path d="M10,10 Q50,20 90,10" />
+                  </svg>
+                </h1>
+                <p className="text-gray-400 mt-4 text-sm uppercase tracking-widest">Atmosphere Gallery</p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1 md:gap-4">
+                {mockItems.map((item) => (
+                  <GridItem key={item.id} item={item} />
+                ))}
+              </div>
+
+            </main>
+
+            <Footer />
+            <BackToTop />
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<App />);
+    </script>
+  </body>
+</html>
